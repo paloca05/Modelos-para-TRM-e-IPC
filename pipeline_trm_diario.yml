@@ -1,0 +1,104 @@
+# .github/workflows/pipeline_trm_diario.yml
+#
+# Workflow: extracción automática de TRM
+# Frecuencia: lunes a viernes a las 8:00 AM hora Colombia (UTC-5 = 13:00 UTC)
+# También se puede ejecutar manualmente desde la pestaña "Actions" en GitHub.
+#
+# PREREQUISITOS:
+#   1. Tener este repositorio en GitHub (público o privado).
+#   2. El workflow tiene permisos para hacer commit de los archivos CSV actualizados.
+#      Ir a: Settings > Actions > General > Workflow permissions > "Read and write"
+#
+
+name: Pipeline TRM diario
+
+on:
+  schedule:
+    # Lunes a viernes a las 13:00 UTC (8:00 AM Colombia, UTC-5)
+    - cron: "0 13 * * 1-5"
+
+  # Permite ejecutar manualmente desde GitHub Actions
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: "Fecha a descargar (YYYY-MM-DD). Vacío = ayer."
+        required: false
+        default: ""
+      rango_inicio:
+        description: "Inicio de rango histórico (YYYY-MM-DD)"
+        required: false
+        default: ""
+      rango_fin:
+        description: "Fin de rango histórico (YYYY-MM-DD)"
+        required: false
+        default: ""
+
+jobs:
+  extraer_trm:
+    name: Extraer y guardar TRM
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # 1. Clonar el repositorio
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. Configurar Python
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      # 3. Instalar dependencias
+      - name: Instalar dependencias
+        run: |
+          pip install --upgrade pip
+          pip install requests pandas
+
+      # 4. Crear carpeta de datos si no existe
+      - name: Crear carpeta data/
+        run: mkdir -p data
+
+      # 5. Ejecutar script de extracción
+      - name: Extraer TRM
+        run: |
+          if [ -n "${{ github.event.inputs.rango_inicio }}" ]; then
+            python scripts/extraer_trm.py \
+              --rango "${{ github.event.inputs.rango_inicio }}" "${{ github.event.inputs.rango_fin }}"
+          elif [ -n "${{ github.event.inputs.fecha }}" ]; then
+            python scripts/extraer_trm.py --fecha "${{ github.event.inputs.fecha }}"
+          else
+            python scripts/extraer_trm.py
+          fi
+
+      # 6. Verificar que se generaron datos
+      - name: Verificar archivos generados
+        run: |
+          echo "=== Archivos en data/ ==="
+          ls -lh data/
+          echo ""
+          echo "=== Últimas 5 filas del maestro ==="
+          tail -5 data/macro_colombia.csv || echo "(archivo aún no existe)"
+
+      # 7. Commit y push de los CSVs actualizados
+      - name: Guardar datos en el repositorio
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/macro_colombia.csv data/pipeline_log.csv || true
+          git diff --staged --quiet || git commit -m "auto: TRM actualizada $(date -u '+%Y-%m-%d')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 8. (Opcional) Notificación por email si el step anterior falló
+      # Para activarlo: agregar secrets.NOTIFY_EMAIL en Settings > Secrets
+      - name: Notificar fallo
+        if: failure()
+        run: |
+          echo "El pipeline de TRM falló el $(date -u). Revisar el log en GitHub Actions."
+          # Para email real, integrar con sendgrid o similar usando secrets
