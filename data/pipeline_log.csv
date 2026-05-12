@@ -1,0 +1,2 @@
+timestamp,script,estado,filas_procesadas,detalle
+2026-05-12T20:58:01.696489,extraer_trm.py,OK,1,Rango: 2025-01-15 a 2025-01-15
