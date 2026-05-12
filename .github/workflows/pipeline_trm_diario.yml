@@ -57,11 +57,11 @@ jobs:
       - name: Extraer TRM
         run: |
           if [ -n "${{ github.event.inputs.rango_inicio }}" ]; then
-            python extraer_trm.py --rango "${{ github.event.inputs.rango_inicio }}" "${{ github.event.inputs.rango_fin }}"
+            python scripts/extraer_trm.py --rango "${{ github.event.inputs.rango_inicio }}" "${{ github.event.inputs.rango_fin }}"
           elif [ -n "${{ github.event.inputs.fecha }}" ]; then
-            python extraer_trm.py --fecha "${{ github.event.inputs.fecha }}"
+            python scripts/extraer_trm.py --fecha "${{ github.event.inputs.fecha }}"
           else
-            python extraer_trm.py
+            python scripts/extraer_trm.py
           fi
 
       - name: Verificar archivos generados
