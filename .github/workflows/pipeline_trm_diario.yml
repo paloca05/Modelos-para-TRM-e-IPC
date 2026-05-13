@@ -14,7 +14,7 @@ name: Pipeline TRM diario
 
 on:
   schedule:
-    - cron: "15 18 * * *"
+    - cron: "40 18 * * *"
   workflow_dispatch:
     inputs:
       fecha:
