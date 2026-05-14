@@ -86,20 +86,24 @@ def actualizar_maestro(df_nuevo: pd.DataFrame, variable: str = "trm") -> None:
     df_nuevo["variable"] = variable
 
     if MASTER_CSV.exists():
-        df_maestro = pd.read_csv(MASTER_CSV, parse_dates=["fecha"])
+        df_maestro = pd.read_csv(MASTER_CSV)
+        df_maestro["fecha"] = pd.to_datetime(df_maestro["fecha"])
+        df_nuevo["fecha"] = pd.to_datetime(df_nuevo["fecha"])
         # eliminar fechas que ya existían para esta variable (upsert)
         mask = df_maestro["variable"] != variable
-        df_maestro_otros = df_maestro[mask]
-        df_maestro_var = df_maestro[~mask]
-        fechas_nuevas = set(pd.to_datetime(df_nuevo["fecha"]).dt.date)
+        df_maestro_otros = df_maestro[mask].copy()
+        df_maestro_var = df_maestro[~mask].copy()
+        fechas_nuevas = set(df_nuevo["fecha"])
         df_maestro_var = df_maestro_var[
-            ~pd.to_datetime(df_maestro_var["fecha"]).dt.date.isin(fechas_nuevas)
+            ~df_maestro_var["fecha"].isin(fechas_nuevas)
         ]
         df_final = pd.concat([df_maestro_otros, df_maestro_var, df_nuevo], ignore_index=True)
     else:
-        df_final = df_nuevo
+        df_final = df_nuevo.copy()
 
-    df_final = df_final.sort_values(["variable", "fecha"])
+    # convertir fecha a string antes de guardar para evitar el error de pandas
+    df_final["fecha"] = pd.to_datetime(df_final["fecha"]).dt.strftime("%Y-%m-%d")
+    df_final = df_final.sort_values(["variable", "fecha"]).reset_index(drop=True)
     df_final.to_csv(MASTER_CSV, index=False)
     log.info(f"Maestro actualizado: {MASTER_CSV} ({len(df_final)} filas totales)")
 
