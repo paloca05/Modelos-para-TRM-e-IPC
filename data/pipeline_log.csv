@@ -9,3 +9,4 @@ timestamp,script,estado,filas_procesadas,detalle
 2026-05-15T22:49:29.108677,extraer_trm.py,OK,84,Rango: 2026-01-01 a 2026-05-11
 2026-05-15T22:51:40.029846,extraer_ipc.py,OK,53,Hasta: 2025-12
 2026-05-18T19:14:33.472672,extraer_trm.py,SIN_DATOS,0,Sin datos para 2026-05-17–2026-05-17
+2026-05-19T19:29:23.228521,extraer_trm.py,SIN_DATOS,0,Sin datos para 2026-05-18–2026-05-18
