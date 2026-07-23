@@ -57,3 +57,4 @@ timestamp,script,estado,filas_procesadas,detalle
 2026-07-20T15:10:22.838013,extraer_trm.py,SIN_DATOS,0,Sin datos para 2026-07-19–2026-07-19
 2026-07-21T15:02:32.657906,extraer_trm.py,SIN_DATOS,0,Sin datos para 2026-07-20–2026-07-20
 2026-07-22T15:02:39.227048,extraer_trm.py,SIN_DATOS,0,Sin datos para 2026-07-21–2026-07-21
+2026-07-23T15:07:21.216899,extraer_trm.py,OK,1,Rango: 2026-07-22 a 2026-07-22
