@@ -135,3 +135,4 @@ timestamp,script,estado,filas_procesadas,detalle
 2026-11-03T19:57:11.193993,extraer_trm.py,SIN_DATOS,0,Sin datos para 2026-11-02–2026-11-02
 2026-11-04T20:16:31.932431,extraer_trm.py,SIN_DATOS,0,Sin datos para 2026-11-03–2026-11-03
 2026-11-05T20:28:00.675160,extraer_trm.py,OK,1,Rango: 2026-11-04 a 2026-11-04
+2026-11-05T21:19:43.565545,extraer_ipc.py,OK,53,Hasta: 2025-12
